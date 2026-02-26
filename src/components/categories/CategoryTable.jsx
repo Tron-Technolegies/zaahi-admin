@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { styled } from "@mui/material/styles";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -9,8 +9,10 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { LiaEdit } from "react-icons/lia";
 import { RiDeleteBinLine } from "react-icons/ri";
+import EditDialog from "./EditDialog";
 
 const CategoryTable = () => {
+  const [open, setOpen] = useState(false);
   const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
       backgroundColor: theme.palette.common.black,
@@ -49,8 +51,8 @@ const CategoryTable = () => {
         <Table sx={{ minWidth: 700 }} aria-label="customized table">
           <TableHead>
             <TableRow>
-              <StyledTableCell align="center">Name</StyledTableCell>
-              <StyledTableCell align="center">Actions</StyledTableCell>
+              <StyledTableCell align="center">NAME</StyledTableCell>
+              <StyledTableCell align="center">ACTIONS</StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -59,12 +61,29 @@ const CategoryTable = () => {
                 <StyledTableCell component="th" scope="row" align="center">
                   {row.name}
                 </StyledTableCell>
-                <StyledTableCell align="center">{row.actions}</StyledTableCell>
+                <StyledTableCell align="center">
+                  <div className="flex justify-center gap-4">
+                    <button
+                      onClick={() => setOpen(true)}
+                      className="text-gray-500 hover:text-blue-800 text-xl transition"
+                    >
+                      <LiaEdit />
+                    </button>
+
+                    <button
+                      onClick={() => handleDelete(row.name)}
+                      className="text-gray-500 hover:text-red-800 text-xl transition"
+                    >
+                      <RiDeleteBinLine />
+                    </button>
+                  </div>
+                </StyledTableCell>
               </StyledTableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
+      <EditDialog open={open} onClose={() => setOpen(false)} />
     </div>
   );
 };

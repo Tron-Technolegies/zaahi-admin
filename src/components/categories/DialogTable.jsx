@@ -101,10 +101,10 @@ export default function DialogTable() {
         </DialogContent>
         <DialogActions>
           <button
-            className="bg-gray-500 hover:bg-black hover:text-white text-white-700  rounded-md transition-all duration-200 px-3 mb-2 mr-2 text-md font-light"
+            className="bg-black hover:bg-gray-700 hover:text-white text-white  rounded-sm transition-all duration-200 px-3 mb-2 mr-2 text-md font-light"
             variant="contained"
           >
-            save
+            SAVE
           </button>
         </DialogActions>
       </Dialog>
