@@ -12,12 +12,10 @@ export default function BrandDialog({ open, handleClose }) {
   const handleSave = () => {
     if (!brandName.trim()) return;
 
-    console.log('Brand Name:', brandName);
+    // console.log('Brand Name:', brandName);
 
-    // Clear input
     setBrandName('');
 
-    // Close dialog
     handleClose();
   };
 
