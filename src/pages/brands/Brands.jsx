@@ -9,7 +9,7 @@ export default function Brands() {
   return (
     <>
       <div className='flex justify-between mb-5'>
-        <h1>Brands</h1>
+        <h1 className='text-3xl font-semibold'>Brands</h1>
 
         <button
           onClick={() => setOpen(true)}

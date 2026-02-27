@@ -10,7 +10,7 @@ export default function Coupons() {
   return (
     <>
       <div className='flex justify-between mb-5'>
-        <h1>Brands</h1>
+        <h1 className='text-3xl font-semibold'>Coupons</h1>
 
         <button
           onClick={() => setOpen(true)}

@@ -67,7 +67,7 @@ export default function BrandDialog({ open, handleClose }) {
         }}
       >
         <input
-          className='p-2 bg-gray-100 rounded-md outline-none w-[220px] text-center font-medium'
+          className='p-2 bg-gray-100 rounded-md outline-none w-55 text-center font-medium'
           placeholder='Enter brand name'
           value={brandName}
           onChange={(e) => setBrandName(e.target.value)}
