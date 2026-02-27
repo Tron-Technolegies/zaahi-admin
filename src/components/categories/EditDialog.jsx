@@ -22,10 +22,7 @@ export default function EditDialog({ open, onClose }) {
   return (
     <React.Fragment>
       <BootstrapDialog onClose={onClose} aria-labelledby="customized-dialog-title" open={open}>
-        <DialogTitle
-          sx={{ m: 0, px: 1, px: 15, fontSize: "18px", fontWeight: "bold" }}
-          id="customized-dialog-title"
-        >
+        <DialogTitle sx={{ m: 0, px: 1, px: 15, fontWeight: "bold" }} id="customized-dialog-title">
           Edit Category
         </DialogTitle>
         <IconButton
