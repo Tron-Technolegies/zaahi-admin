@@ -1,6 +1,9 @@
-import { IoMail, IoNotifications } from "react-icons/io5";
-import { MdCategory, MdOutlineInventory } from "react-icons/md";
-import { RiToolsFill } from "react-icons/ri";
+import { IoMail, IoPeopleOutline, IoNotifications } from "react-icons/io5";
+import { MdOutlineDashboard, MdOutlineInventory } from "react-icons/md";
+import { RiToolsFill, RiCoupon3Line } from "react-icons/ri";
+import { FiShoppingCart } from "react-icons/fi";
+import { LuBox, LuBoxes } from "react-icons/lu";
+import { TbBrandAmigo } from "react-icons/tb";
 
 export const adminNavLinks = [
   {
@@ -8,48 +11,48 @@ export const adminNavLinks = [
     name: "Dashboard",
     path: "/dashboard",
     urlword: "dashboard",
-    icon: <MdCategory />,
+    icon: <MdOutlineDashboard />,
   },
   {
     id: 2,
     name: "Categories",
     path: "/category",
     urlword: "category",
-    icon: <RiToolsFill />,
+    icon: <LuBoxes />,
   },
   {
     id: 3,
     name: "Brands",
     path: "/brands",
     urlword: "brands",
-    icon: <MdOutlineInventory />,
+    icon: <TbBrandAmigo />,
   },
   {
     id: 7,
     name: "Products",
     path: "/products",
     urlword: "products",
-    icon: <IoMail />,
+    icon: <LuBox />,
   },
   {
     id: 4,
     name: "Orders",
     path: "/orders",
     urlword: "orders",
-    icon: <IoNotifications />,
+    icon: <FiShoppingCart />,
   },
   {
     id: 5,
     name: "Customers",
     path: "/customers",
     urlword: "customers",
-    icon: <IoMail />,
+    icon: <IoPeopleOutline />,
   },
   {
     id: 6,
     name: "Coupons",
     path: "/coupons",
     urlword: "coupons",
-    icon: <IoMail />,
+    icon: <RiCoupon3Line />,
   },
 ];
