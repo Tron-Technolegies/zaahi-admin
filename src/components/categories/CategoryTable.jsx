@@ -11,8 +11,9 @@ import { LiaEdit } from "react-icons/lia";
 import { RiDeleteBinLine } from "react-icons/ri";
 import EditDialog from "./EditDialog";
 
-const CategoryTable = () => {
+const CategoryTable = ({ data }) => {
   const [open, setOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
   const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
       backgroundColor: theme.palette.common.black,
@@ -33,18 +34,6 @@ const CategoryTable = () => {
     },
   }));
 
-  function createData(name, actions) {
-    return { name, actions };
-  }
-
-  const rows = [
-    createData("Kurti", "<LiaEdit /> <RiDeleteBinLine />"),
-    createData("Lehanga", "edit delete"),
-    createData("Saree", "edit delete"),
-    createData("Salwar kameez", "edit delete"),
-    createData("Gown", "edit delete"),
-  ];
-
   return (
     <div>
       <TableContainer component={Paper}>
@@ -56,15 +45,18 @@ const CategoryTable = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row) => (
-              <StyledTableRow key={row.name}>
+            {data.map((row) => (
+              <StyledTableRow key={row._id}>
                 <StyledTableCell component="th" scope="row" align="center">
-                  {row.name}
+                  {row.categoryName}
                 </StyledTableCell>
                 <StyledTableCell align="center">
                   <div className="flex justify-center gap-4">
                     <button
-                      onClick={() => setOpen(true)}
+                      onClick={() => {
+                        setOpen(true);
+                        setSelectedItem(row);
+                      }}
                       className="text-gray-500 hover:text-blue-800 text-xl transition"
                     >
                       <LiaEdit />
@@ -83,7 +75,7 @@ const CategoryTable = () => {
           </TableBody>
         </Table>
       </TableContainer>
-      <EditDialog open={open} onClose={() => setOpen(false)} />
+      <EditDialog item={selectedItem} open={open} onClose={() => setOpen(false)} />
     </div>
   );
 };
