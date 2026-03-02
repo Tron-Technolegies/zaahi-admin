@@ -8,6 +8,7 @@ import AddIcon from "@mui/icons-material/Add";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
+import { useAddCategory } from "../../hooks/categories/useCategory";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -21,6 +22,7 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 export default function DialogTable() {
   const [open, setOpen] = React.useState(false);
   const [categoryName, setCategoryName] = React.useState("");
+  const { isPending, mutateAsync } = useAddCategory();
 
   return (
     <React.Fragment>
@@ -101,10 +103,16 @@ export default function DialogTable() {
         </DialogContent>
         <DialogActions>
           <button
+            onClick={async () => {
+              const data = { categoryName };
+              await mutateAsync(data);
+              setOpen(false);
+            }}
+            disabled={isPending}
             className="bg-black hover:bg-gray-700 hover:text-white text-white  rounded-sm transition-all duration-200 px-3 mb-2 mr-2 text-md font-light"
             variant="contained"
           >
-            SAVE
+            {isPending ? "saving..." : "Save"}
           </button>
         </DialogActions>
       </Dialog>

@@ -8,6 +8,9 @@ import DialogActions from "@mui/material/DialogActions";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import Typography from "@mui/material/Typography";
+import { useEditCategory, useGetSingleCategory } from "../../hooks/categories/useCategory";
+import { useState } from "react";
+import { useEffect } from "react";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -18,14 +21,20 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
-export default function EditDialog({ open, onClose }) {
+export default function EditDialog({ open, onClose, item }) {
+  const { data } = useGetSingleCategory({ id: item?._id });
+  const [categoryName, setCategoryName] = useState(data?.categoryName || "");
+  const { isPending, mutateAsync } = useEditCategory();
+
+  useEffect(() => {
+    if (data) {
+      setCategoryName(data.categoryName);
+    }
+  }, [data]);
   return (
     <React.Fragment>
       <BootstrapDialog onClose={onClose} aria-labelledby="customized-dialog-title" open={open}>
-        <DialogTitle
-          sx={{ m: 0, px: 1, px: 15, fontSize: "18px", fontWeight: "bold" }}
-          id="customized-dialog-title"
-        >
+        <DialogTitle sx={{ m: 0, px: 1, px: 15, fontWeight: "bold" }} id="customized-dialog-title">
           Edit Category
         </DialogTitle>
         <IconButton
@@ -44,17 +53,23 @@ export default function EditDialog({ open, onClose }) {
           <Typography gutterBottom className="flex justify-center">
             <input
               className="p-2 bg-gray-200 rounded-md outline-none w-[200px] text-center font-medium"
-              value=""
               required
+              onChange={(e) => setCategoryName(e.target.value)}
+              value={categoryName}
             />
           </Typography>
         </DialogContent>
         <DialogActions>
           <button
+            disabled={isPending}
             className="bg-black hover:bg-gray-700 hover:text-white text-white  rounded-sm transition-all duration-200 px-3 mb-2 mr-2 text-md font-light"
-            onClick={onClose}
+            onClick={async () => {
+              const data = { categoryName, id: item._id };
+              await mutateAsync(data);
+              onClose();
+            }}
           >
-            SAVE
+            {isPending ? "Updating..." : "Update"}
           </button>
         </DialogActions>
       </BootstrapDialog>
