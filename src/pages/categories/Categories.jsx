@@ -1,7 +1,5 @@
-import React, { useState } from "react";
 import CategoryTable from "../../components/categories/CategoryTable";
-import DialogTable from "../../components/categories/Dialogtable";
-import { MdEdit } from "react-icons/md";
+import DialogTable from "../../components/categories/DialogTable";
 import { useGetCategories } from "../../hooks/categories/useCategory";
 
 export default function Categories() {
