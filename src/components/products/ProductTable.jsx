@@ -11,22 +11,13 @@ import {
   Box,
   Chip,
   Typography,
+  CircularProgress,
+  Avatar,
 } from "@mui/material";
 import { FiEdit } from "react-icons/fi";
 import { RiDeleteBinLine } from "react-icons/ri";
-import { LuImage } from "react-icons/lu";
-
-function createDress(id, productName, category, price, stock, status) {
-  return { _id: id, productName, category, price, stock, status };
-}
-
-const rows = [
-  createDress(1, "Floral Print A-Line Dress", "Western Wear", 1299, 25, "In Stock"),
-  createDress(2, "Embroidered Lehenga Choli", "Ethnic Wear", 3499, 10, "Low Stock"),
-  createDress(3, "Cotton Pink Party Frock", "Western Wear", 850, 40, "In Stock"),
-  createDress(4, "Silk Pattu Pavadai Set", "Ethnic Wear", 2100, 5, "Low Stock"),
-  createDress(5, "Denim Dungaree with Tee", "Casual Wear", 1150, 0, "Out of Stock"),
-];
+// Import the delete hook
+import { useGetProducts, useDeleteProduct } from "../../hooks/product/useProducts";
 
 const getStatusStyles = (status) => {
   switch (status) {
@@ -42,13 +33,35 @@ const getStatusStyles = (status) => {
 };
 
 export default function ProductTable({ onEdit }) {
+  const { data, isLoading, isError } = useGetProducts();
+  // Initialize the delete mutation
+  const { mutateAsync: deleteProduct, isPending: isDeleting } = useDeleteProduct();
+
+  const products = data?.products || [];
+
+  const handleDelete = async (id, name) => {
+    if (window.confirm(`Are you sure you want to delete "${name}"?`)) {
+      await deleteProduct(id);
+    }
+  };
+
+  if (isLoading)
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", p: 5 }}>
+        <CircularProgress />
+      </Box>
+    );
+
+  if (isError || products.length === 0)
+    return <Typography sx={{ p: 5, textAlign: "center" }}>No products found.</Typography>;
+
   return (
     <TableContainer
       component={Paper}
       sx={{
         borderRadius: "16px",
-        border: "1px solid #6B7280",
-        boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+        border: "1px solid #E5E7EB",
+        boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
       }}
     >
       <Table sx={{ minWidth: 650 }}>
@@ -63,7 +76,7 @@ export default function ProductTable({ onEdit }) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
+          {products.map((row) => (
             <TableRow
               key={row._id}
               hover
@@ -71,20 +84,17 @@ export default function ProductTable({ onEdit }) {
             >
               <TableCell>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                  <Box
+                  {/* Display the actual product image */}
+                  <Avatar
+                    src={row.image}
+                    variant="rounded"
                     sx={{
                       width: 48,
                       height: 48,
                       bgcolor: "#F9FAFB",
-                      borderRadius: "8px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
                       border: "1px solid #E5E7EB",
                     }}
-                  >
-                    <LuImage style={{ color: "#9CA3AF", fontSize: "20px" }} />
-                  </Box>
+                  />
                   <Typography variant="body2" sx={{ fontWeight: 600, color: "#111827" }}>
                     {row.productName}
                   </Typography>
@@ -92,12 +102,12 @@ export default function ProductTable({ onEdit }) {
               </TableCell>
               <TableCell sx={{ color: "#6B7280" }}>{row.category}</TableCell>
               <TableCell sx={{ fontWeight: 700, color: "#111827" }}>
-                ₹{row.price.toLocaleString()}
+                ₹{row.price?.toLocaleString()}
               </TableCell>
               <TableCell sx={{ color: "#6B7280" }}>{row.stock} units</TableCell>
               <TableCell>
                 <Chip
-                  label={row.status}
+                  label={row.status || (row.stock > 0 ? "In Stock" : "Out of Stock")}
                   size="small"
                   sx={{ ...getStatusStyles(row.status), fontWeight: 520, border: 1 }}
                 />
@@ -106,16 +116,20 @@ export default function ProductTable({ onEdit }) {
                 <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1.5 }}>
                   <IconButton
                     onClick={() => onEdit(row)}
-                    sx={{
-                      color: "#9CA3AF",
-                      p: 1,
-                      transition: "all 0.2s ease",
-                      "&:hover": { color: "#F59E0B" },
-                    }}
+                    sx={{ color: "#9CA3AF", "&:hover": { color: "#F59E0B" } }}
                   >
                     <FiEdit size={18} />
                   </IconButton>
-                  <IconButton sx={{ color: "#9CA3AF", p: 1, "&:hover": { color: "#EF4444" } }}>
+
+                  <IconButton
+                    onClick={() => handleDelete(row._id, row.productName)}
+                    disabled={isDeleting}
+                    sx={{
+                      color: "#9CA3AF",
+                      "&:hover": { color: "#EF4444" },
+                      opacity: isDeleting ? 0.5 : 1,
+                    }}
+                  >
                     <RiDeleteBinLine size={18} />
                   </IconButton>
                 </Box>

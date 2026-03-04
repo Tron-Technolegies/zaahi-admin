@@ -1,27 +1,24 @@
 import React, { useState } from "react";
 import ProductTable from "../../components/products/ProductTable";
-import ProductDialog from "../../components/products/ProductDialog";
+import AddProductDialog from "../../components/products/AddProductDialog";
+import EditProductDialog from "../../components/products/EditProductDialog";
 import { FiFilter } from "react-icons/fi";
-import { HiPlus } from "react-icons/hi";
 
 export default function Products() {
-  const [open, setOpen] = useState(false);
-  const [dialogMode, setDialogMode] = useState("add");
+  // We only need to manage state for the Edit dialog
+  // because AddProductDialog handles its own state internally.
+  const [editOpen, setEditOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-  const handleAddOpen = () => {
-    setDialogMode("add");
-    setSelectedProduct(null);
-    setOpen(true);
-  };
-
   const handleEditOpen = (product) => {
-    setDialogMode("edit");
     setSelectedProduct(product);
-    setOpen(true);
+    setEditOpen(true);
   };
 
-  const handleClose = () => setOpen(false);
+  const handleEditClose = () => {
+    setEditOpen(false);
+    setSelectedProduct(null);
+  };
 
   return (
     <div className="p-10 min-h-screen flex flex-col gap-8 bg-[#FAFAFA]">
@@ -31,23 +28,14 @@ export default function Products() {
           <span>Filter</span>
         </button>
 
-        <button
-          onClick={handleAddOpen}
-          className="flex items-center gap-1 px-4 py-1.5 bg-[#171717] text-[#FACC15] rounded-xl font-medium hover:bg-black transition-all shadow-lg text-lg active:scale-95"
-        >
-          <HiPlus className="text-2xl" />
-          <span>Add Product</span>
-        </button>
+        {/* This component now contains its own "Add Product" button and Dialog */}
+        <AddProductDialog />
       </div>
 
       <ProductTable onEdit={handleEditOpen} />
 
-      <ProductDialog
-        open={open}
-        handleClose={handleClose}
-        mode={dialogMode}
-        editData={selectedProduct}
-      />
+      {/* Specifically for editing existing records */}
+      <EditProductDialog open={editOpen} onClose={handleEditClose} item={selectedProduct} />
     </div>
   );
 }
