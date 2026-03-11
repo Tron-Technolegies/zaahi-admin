@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -8,6 +8,8 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { FaEdit, FaTrash } from 'react-icons/fa';
+import BrandEditDialog from './BrandEditDialog';
+import DeleteDialog from './DeleteDialog';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -29,59 +31,72 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-const rows = [
-  { name: 'Puma' },
-  { name: 'Adidas' },
-  { name: 'Fastrack' },
-  { name: 'Nike' },
-];
+const BrandTable = ({ data }) => {
+  const [open, setOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [selectedBrand, setSelectedBrand] = useState(null);
 
-const BrandTable = () => {
-  const handleEdit = (name) => {
-    console.log('Edit:', name);
-  };
-
-  const handleDelete = (name) => {
-    console.log('Delete:', name);
+  const handleDeleteClick = (brand) => {
+    setSelectedBrand(brand);
+    setDeleteOpen(true);
   };
 
   return (
-    <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
-      <Table sx={{ minWidth: 700 }}>
-        <TableHead>
-          <TableRow>
-            <StyledTableCell align='center'>Brand Name</StyledTableCell>
-            <StyledTableCell align='center'>Actions</StyledTableCell>
-          </TableRow>
-        </TableHead>
+    <>
+      <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
+        <Table sx={{ minWidth: 700 }}>
+          <TableHead>
+            <TableRow>
+              <StyledTableCell align='center'>Brand Name</StyledTableCell>
+              <StyledTableCell align='center'>Actions</StyledTableCell>
+            </TableRow>
+          </TableHead>
 
-        <TableBody>
-          {rows.map((row) => (
-            <StyledTableRow key={row.name}>
-              <StyledTableCell align='center'>{row.name}</StyledTableCell>
+          <TableBody>
+            {data.map((row) => (
+              <StyledTableRow key={row._id}>
+                <StyledTableCell align='center'>
+                  {row.brandName}
+                </StyledTableCell>
 
-              <StyledTableCell align='center'>
-                <div className='flex justify-center gap-4'>
-                  <button
-                    onClick={() => handleEdit(row.name)}
-                    className='text-gray-500 hover:text-blue-800 text-lg transition'
-                  >
-                    <FaEdit />
-                  </button>
+                <StyledTableCell align='center'>
+                  <div className='flex justify-center gap-4'>
+                    <button
+                      onClick={() => {
+                        setOpen(true);
+                        setSelectedBrand(row);
+                      }}
+                      className='text-gray-500 hover:text-blue-800 text-lg transition'
+                    >
+                      <FaEdit />
+                    </button>
 
-                  <button
-                    onClick={() => handleDelete(row.name)}
-                    className='text-gray-500 hover:text-red-800 text-lg transition'
-                  >
-                    <FaTrash />
-                  </button>
-                </div>
-              </StyledTableCell>
-            </StyledTableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+                    <button
+                      onClick={() => handleDeleteClick(row)}
+                      className='text-gray-500 hover:text-red-800 text-lg transition'
+                    >
+                      <FaTrash />
+                    </button>
+                  </div>
+                </StyledTableCell>
+              </StyledTableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      <BrandEditDialog
+        open={open}
+        handleClose={() => setOpen(false)}
+        item={selectedBrand}
+      />
+
+      <DeleteDialog
+        open={deleteOpen}
+        handleClose={() => setDeleteOpen(false)}
+        item={selectedBrand}
+      />
+    </>
   );
 };
 

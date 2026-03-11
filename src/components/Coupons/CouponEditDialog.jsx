@@ -5,20 +5,25 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-import { useAddCoupons } from '../../hooks/coupons/useCoupon';
+import { useEditCoupon } from '../../hooks/coupons/useCoupon';
 
-export default function CouponAddDialog({ open, handleClose }) {
-  const { isPending, mutateAsync } = useAddCoupons();
+export default function CouponEditDialog({ open, handleClose, item }) {
+  const { isPending, mutateAsync } = useEditCoupon();
 
   const [couponData, setCouponData] = React.useState({
     code: '',
-    type: 'Percentage',
+    type: 'percentage',
     value: '',
     expiryDate: '',
     usage: '',
-    status: 'Active',
+    status: 'active',
   });
 
+  React.useEffect(() => {
+    if (item) {
+      setCouponData(item);
+    }
+  }, [item]);
   const handleChange = (e) => {
     setCouponData({
       ...couponData,
@@ -52,7 +57,7 @@ export default function CouponAddDialog({ open, handleClose }) {
           p: 3,
         }}
       >
-        Add Coupon
+        Edit Coupon
       </DialogTitle>
 
       <IconButton
@@ -139,22 +144,23 @@ export default function CouponAddDialog({ open, handleClose }) {
 
         <button
           onClick={async () => {
-            await mutateAsync(couponData);
+            const data = { id: item._id, ...couponData };
+            await mutateAsync(data);
 
             setCouponData({
               code: '',
-              type: 'Percentage',
+              type: 'percentage',
               value: '',
               expiryDate: '',
               usage: '',
-              status: 'Active',
+              status: 'active',
             });
 
             handleClose();
           }}
           className='bg-black text-white px-4 py-1 rounded-md hover:bg-gray-800 transition'
         >
-          {isPending ? 'saving...' : 'Save'}
+          {isPending ? 'Updating...' : 'Update'}
         </button>
       </DialogActions>
     </Dialog>

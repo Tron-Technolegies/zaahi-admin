@@ -1,26 +1,27 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../services/api';
 import { toast } from 'react-toastify';
-
-export const useGetCategories = () => {
+export const useGetBrands = () => {
   const { isLoading, isError, error, data } = useQuery({
-    queryKey: ['categories'],
+    queryKey: ['brands'],
     queryFn: async () => {
-      const { data } = await api.get(`/category`);
+      const { data } = await api.get(`/brand`);
       return data;
     },
   });
   return { isLoading, isError, error, data };
 };
 
-export const useAddCategory = () => {
+export const useAddBrands = () => {
   const queryClient = useQueryClient();
   const { isPending, mutateAsync } = useMutation({
     mutationFn: async (data) => {
-      await api.post(`/category`, data);
+      await api.post(`/brand`, data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      queryClient.invalidateQueries({
+        queryKey: ['brands'],
+      });
       toast.success('Added');
     },
     onError: (error) => {
@@ -34,26 +35,26 @@ export const useAddCategory = () => {
   return { isPending, mutateAsync };
 };
 
-export const useGetSingleCategory = ({ id }) => {
+export const useGetSingleBrand = ({ id }) => {
   const { isLoading, isError, error, data } = useQuery({
-    queryKey: ['category', id],
+    queryKey: ['brand', id],
     queryFn: async () => {
-      const { data } = await api.get(`/category/${id}`);
+      const { data } = await api.get(`/brand/${id}`);
       return data;
     },
   });
   return { isError, isLoading, error, data };
 };
 
-export const useEditCategory = () => {
+export const useEditBrand = () => {
   const queryClient = useQueryClient();
   const { isPending, mutateAsync } = useMutation({
     mutationFn: async (data) => {
-      await api.patch(`/category/edit/${data.id}`, data);
+      await api.patch(`/brand/edit/${data.id}`, data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
-      queryClient.invalidateQueries({ queryKey: ['category'] });
+      queryClient.invalidateQueries({ queryKey: ['brands'] });
+      queryClient.invalidateQueries({ queryKey: ['brand'] });
 
       toast.success('Updated');
     },
@@ -68,14 +69,14 @@ export const useEditCategory = () => {
   return { isPending, mutateAsync };
 };
 
-export const useDeleteCategory = () => {
+export const useDeleteBrand = () => {
   const queryClient = useQueryClient();
   const { isPending, mutateAsync } = useMutation({
     mutationFn: async (data) => {
-      await api.delete(`/category/delete/${data.id}`, data);
+      await api.delete(`/brand/delete/${data.id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      queryClient.invalidateQueries({ queryKey: ['brands'] });
 
       toast.success('Deleted');
     },
