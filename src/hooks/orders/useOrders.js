@@ -20,12 +20,29 @@ export const usePlaceOrder = () => {
 };
 
 export const useGetOrder = () => {
-  const { isLoading, isError, error, data } = useQuery({
+  const { isLoading, isError, data } = useQuery({
     queryKey: ["orders"],
     queryFn: async () => {
       const { data } = await api.get("/order/all");
       return data;
     },
   });
-  return { isLoading, isError, error, data };
+  return { isLoading, isError, data };
+};
+
+export const useUpdateOrderStatus = () => {
+  const queryClient = useQueryClient();
+  const { isPending, mutateAsync } = useMutation({
+    mutationFn: async ({ orderId, status }) => {
+      await api.patch(`/order/${orderId}/status`, { status });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      toast.success("Order status updated");
+    },
+    onError: (error) => {
+      toast.error(error?.response?.data?.error || error?.response?.data?.message || error.message);
+    },
+  });
+  return { isPending, mutateAsync };
 };
