@@ -2,9 +2,11 @@ import React from 'react';
 import BrandTable from '../../components/Brands/BrandTable';
 import BrandDialog from '../../components/Brands/BrandDialog';
 import { FaPlus } from 'react-icons/fa6';
+import { useGetBrands } from '../../hooks/brands/useBrands';
 
 export default function Brands() {
   const [open, setOpen] = React.useState(false);
+  const { isError, isLoading, error, data } = useGetBrands();
 
   return (
     <>
@@ -18,8 +20,14 @@ export default function Brands() {
           <FaPlus /> Add Brand
         </button>
       </div>
-
-      <BrandTable />
+      {isLoading ? (
+        <p>Loading....</p>
+      ) : isError ? (
+        <p>{error.message}</p>
+      ) : (
+        <BrandTable data={data} />
+      )}
+      {console.log(data)}
 
       <BrandDialog open={open} handleClose={() => setOpen(false)} />
     </>

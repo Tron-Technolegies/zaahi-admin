@@ -3,9 +3,11 @@ import React from 'react';
 import { FaPlus } from 'react-icons/fa6';
 import CouponTable from '../../components/Coupons/CouponTable';
 import CouponAddDialog from '../../components/Coupons/CouponAddDialog';
+import { useGetCoupons } from '../../hooks/coupons/useCoupon';
 
 export default function Coupons() {
   const [open, setOpen] = React.useState(false);
+  const { isError, isLoading, error, data } = useGetCoupons();
 
   return (
     <>
@@ -19,8 +21,15 @@ export default function Coupons() {
           <FaPlus /> Add Coupon
         </button>
       </div>
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : isError ? (
+        <p>{error.message}</p>
+      ) : (
+        <CouponTable data={data} />
+      )}
 
-      <CouponTable onEdit={() => setOpen(true)} />
+      {/* <CouponTable onEdit={() => setOpen(true)} /> */}
 
       <CouponAddDialog open={open} handleClose={() => setOpen(false)} />
     </>

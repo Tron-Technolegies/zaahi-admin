@@ -5,19 +5,11 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import { useAddBrands } from '../../hooks/brands/useBrands';
 
 export default function BrandDialog({ open, handleClose }) {
   const [brandName, setBrandName] = React.useState('');
-
-  const handleSave = () => {
-    if (!brandName.trim()) return;
-
-    // console.log('Brand Name:', brandName);
-
-    setBrandName('');
-
-    handleClose();
-  };
+  const { isPending, mutateAsync } = useAddBrands();
 
   return (
     <Dialog
@@ -71,15 +63,20 @@ export default function BrandDialog({ open, handleClose }) {
           placeholder='Enter brand name'
           value={brandName}
           onChange={(e) => setBrandName(e.target.value)}
+          required
         />
       </DialogContent>
 
       <DialogActions sx={{ justifyContent: 'center', pb: 2 }}>
         <button
-          onClick={handleSave}
+          onClick={async () => {
+            const data = { brandName };
+            await mutateAsync(data);
+            handleClose();
+          }}
           className='bg-black text-white px-4 py-1 rounded-md hover:bg-gray-800 transition'
         >
-          Save
+          {isPending ? 'saving...' : 'Save'}
         </button>
       </DialogActions>
     </Dialog>
