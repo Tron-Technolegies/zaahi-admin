@@ -17,7 +17,10 @@ import {
 import { FiEdit } from "react-icons/fi";
 import { RiDeleteBinLine } from "react-icons/ri";
 // Import the delete hook
-import { useGetProducts, useDeleteProduct } from "../../hooks/product/useProducts";
+import {
+  useGetProducts,
+  useDeleteProduct,
+} from "../../hooks/product/useProducts";
 
 const getStatusStyles = (status) => {
   switch (status) {
@@ -35,7 +38,8 @@ const getStatusStyles = (status) => {
 export default function ProductTable({ onEdit }) {
   const { data, isLoading, isError } = useGetProducts();
   // Initialize the delete mutation
-  const { mutateAsync: deleteProduct, isPending: isDeleting } = useDeleteProduct();
+  const { mutateAsync: deleteProduct, isPending: isDeleting } =
+    useDeleteProduct();
 
   const products = data?.products || [];
 
@@ -53,7 +57,11 @@ export default function ProductTable({ onEdit }) {
     );
 
   if (isError || products.length === 0)
-    return <Typography sx={{ p: 5, textAlign: "center" }}>No products found.</Typography>;
+    return (
+      <Typography sx={{ p: 5, textAlign: "center" }}>
+        No products found.
+      </Typography>
+    );
 
   return (
     <TableContainer
@@ -66,12 +74,20 @@ export default function ProductTable({ onEdit }) {
     >
       <Table sx={{ minWidth: 650 }}>
         <TableHead>
-          <TableRow sx={{ "& th": { color: "#6B7280", fontWeight: 600, fontSize: "0.95rem" } }}>
+          <TableRow
+            sx={{
+              "& th": {
+                color: "#6B7280",
+                fontWeight: 600,
+                fontSize: "0.95rem",
+              },
+            }}
+          >
             <TableCell>PRODUCT</TableCell>
             <TableCell>CATEGORY</TableCell>
             <TableCell>PRICE</TableCell>
             <TableCell>STOCK</TableCell>
-            <TableCell>STATUS</TableCell>
+            {/* <TableCell>STATUS</TableCell> */}
             <TableCell align="right">ACTIONS</TableCell>
           </TableRow>
         </TableHead>
@@ -86,7 +102,7 @@ export default function ProductTable({ onEdit }) {
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                   {/* Display the actual product image */}
                   <Avatar
-                    src={row.image}
+                    src={row.image?.url}
                     variant="rounded"
                     sx={{
                       width: 48,
@@ -95,25 +111,44 @@ export default function ProductTable({ onEdit }) {
                       border: "1px solid #E5E7EB",
                     }}
                   />
-                  <Typography variant="body2" sx={{ fontWeight: 600, color: "#111827" }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ fontWeight: 600, color: "#111827" }}
+                  >
                     {row.productName}
                   </Typography>
                 </Box>
               </TableCell>
               <TableCell sx={{ color: "#6B7280" }}>{row.category}</TableCell>
               <TableCell sx={{ fontWeight: 700, color: "#111827" }}>
-                ₹{row.price?.toLocaleString()}
+                ₹{row.basePrice?.toLocaleString()}
               </TableCell>
-              <TableCell sx={{ color: "#6B7280" }}>{row.stock} units</TableCell>
-              <TableCell>
+              <TableCell sx={{ color: "#6B7280" }}>
+                {row.variants?.map((item) => (
+                  <div key={item.size} className="flex gap-2">
+                    <p>{item.size}</p>
+                    <p>{item.stock} nos</p>
+                    <p>Rs {item.price}</p>
+                  </div>
+                ))}
+              </TableCell>
+              {/* <TableCell>
                 <Chip
-                  label={row.status || (row.stock > 0 ? "In Stock" : "Out of Stock")}
+                  label={
+                    row.status || (row.stock > 0 ? "In Stock" : "Out of Stock")
+                  }
                   size="small"
-                  sx={{ ...getStatusStyles(row.status), fontWeight: 520, border: 1 }}
+                  sx={{
+                    ...getStatusStyles(row.status),
+                    fontWeight: 520,
+                    border: 1,
+                  }}
                 />
-              </TableCell>
+              </TableCell> */}
               <TableCell align="right">
-                <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1.5 }}>
+                <Box
+                  sx={{ display: "flex", justifyContent: "flex-end", gap: 1.5 }}
+                >
                   <IconButton
                     onClick={() => onEdit(row)}
                     sx={{ color: "#9CA3AF", "&:hover": { color: "#F59E0B" } }}

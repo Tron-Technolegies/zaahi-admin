@@ -17,13 +17,16 @@ export const useAddProduct = () => {
   return useMutation({
     mutationFn: async (formData) => {
       // We pass the FormData object directly; axios/api will set the correct headers
-      await api.post(`/product`, formData);
+      await api.post(`/product`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
       toast.success("Product added successfully");
     },
-    onError: (err) => toast.error(err.response?.data?.error || "Upload failed"),
+    onError: (err) =>
+      toast.error(err.response?.data?.error || "Product failed"),
   });
 };
 
@@ -32,10 +35,13 @@ export const useEditProduct = () => {
   return useMutation({
     mutationFn: async ({ id, data }) => {
       // Backend uses patch(`/product/edit/${id}`)
-      await api.patch(`/product/edit/${id}`, data);
+      await api.patch(`/product/edit/${id}`, data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["product"] });
       toast.success("Updated Successfully");
     },
     onError: (err) => toast.error(err.response?.data?.error || "Update failed"),
@@ -69,4 +75,21 @@ export const useDeleteProduct = () => {
       toast.error(error?.response?.data?.error || "Failed to delete product");
     },
   });
+};
+
+export const useDeleteProductImage = () => {
+  const queryClient = useQueryClient();
+  const { isPending, mutateAsync } = useMutation({
+    mutationFn: async (data) => {
+      await api.patch(`/product/delete-image`, data);
+    },
+    onSuccess: (_, data) => {
+      queryClient.invalidateQueries({ queryKey: ["product", data.productId] });
+      toast.success("deleted");
+    },
+    onError: (error) => {
+      toast.error(error.response.data.error || error.response.data.message);
+    },
+  });
+  return { isPending, mutateAsync };
 };
