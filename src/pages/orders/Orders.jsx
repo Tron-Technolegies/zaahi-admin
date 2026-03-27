@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import OrderTable from "../../components/Orders/OrderTable";
-import { useGetOrder } from "../../hooks/orders/useOrders";
+import { useGetOrder } from "../../hooks/Orders/useOrders";
 import PaginationComponent from "../../components/PaginationComponent";
 
 export default function Orders() {
