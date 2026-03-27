@@ -48,11 +48,11 @@ export const adminNavLinks = [
     urlword: "customers",
     icon: <IoPeopleOutline />,
   },
-  {
-    id: 6,
-    name: "Coupons",
-    path: "/coupons",
-    urlword: "coupons",
-    icon: <RiCoupon3Line />,
-  },
+  // {
+  //   id: 6,
+  //   name: "Coupons",
+  //   path: "/coupons",
+  //   urlword: "coupons",
+  //   icon: <RiCoupon3Line />,
+  // },
 ];

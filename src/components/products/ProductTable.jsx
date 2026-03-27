@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -21,6 +21,8 @@ import {
   useGetProducts,
   useDeleteProduct,
 } from "../../hooks/product/useProducts";
+import Loading from "../Loading";
+import PaginationComponent from "../PaginationComponent";
 
 const getStatusStyles = (status) => {
   switch (status) {
@@ -36,7 +38,13 @@ const getStatusStyles = (status) => {
 };
 
 export default function ProductTable({ onEdit }) {
-  const { data, isLoading, isError } = useGetProducts();
+  const [search, setSearch] = useState("");
+  const [debounced, setDebounced] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const { data, isLoading, isError } = useGetProducts({
+    search: debounced,
+    currentPage,
+  });
   // Initialize the delete mutation
   const { mutateAsync: deleteProduct, isPending: isDeleting } =
     useDeleteProduct();
@@ -49,90 +57,93 @@ export default function ProductTable({ onEdit }) {
     }
   };
 
-  if (isLoading)
-    return (
-      <Box sx={{ display: "flex", justifyContent: "center", p: 5 }}>
-        <CircularProgress />
-      </Box>
-    );
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebounced(search);
+    }, 700);
+    return () => clearTimeout(handler);
+  }, [search]);
 
-  if (isError || products.length === 0)
-    return (
-      <Typography sx={{ p: 5, textAlign: "center" }}>
-        No products found.
-      </Typography>
-    );
-
-  return (
-    <TableContainer
-      component={Paper}
-      sx={{
-        borderRadius: "16px",
-        border: "1px solid #E5E7EB",
-        boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
-      }}
-    >
-      <Table sx={{ minWidth: 650 }}>
-        <TableHead>
-          <TableRow
-            sx={{
-              "& th": {
-                color: "#6B7280",
-                fontWeight: 600,
-                fontSize: "0.95rem",
-              },
-            }}
-          >
-            <TableCell>PRODUCT</TableCell>
-            <TableCell>CATEGORY</TableCell>
-            <TableCell>PRICE</TableCell>
-            <TableCell>STOCK</TableCell>
-            {/* <TableCell>STATUS</TableCell> */}
-            <TableCell align="right">ACTIONS</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {products.map((row) => (
+  return isLoading ? (
+    <Loading />
+  ) : (
+    <>
+      <input
+        type="search"
+        placeholder="search"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="shadow p-2 w-fit rounded-md outline-none"
+      />
+      <TableContainer
+        component={Paper}
+        sx={{
+          borderRadius: "16px",
+          border: "1px solid #E5E7EB",
+          boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
+        }}
+      >
+        <Table sx={{ minWidth: 650 }}>
+          <TableHead>
             <TableRow
-              key={row._id}
-              hover
-              sx={{ "& td": { py: 2.5, borderBottom: "1px solid #F3F4F6" } }}
+              sx={{
+                "& th": {
+                  color: "#6B7280",
+                  fontWeight: 600,
+                  fontSize: "0.95rem",
+                },
+              }}
             >
-              <TableCell>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                  {/* Display the actual product image */}
-                  <Avatar
-                    src={row.image?.url}
-                    variant="rounded"
-                    sx={{
-                      width: 48,
-                      height: 48,
-                      bgcolor: "#F9FAFB",
-                      border: "1px solid #E5E7EB",
-                    }}
-                  />
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: 600, color: "#111827" }}
-                  >
-                    {row.productName}
-                  </Typography>
-                </Box>
-              </TableCell>
-              <TableCell sx={{ color: "#6B7280" }}>{row.category}</TableCell>
-              <TableCell sx={{ fontWeight: 700, color: "#111827" }}>
-                ₹{row.basePrice?.toLocaleString()}
-              </TableCell>
-              <TableCell sx={{ color: "#6B7280" }}>
-                {row.variants?.map((item) => (
-                  <div key={item.size} className="flex gap-2">
-                    <p>{item.size}</p>
-                    <p>{item.stock} nos</p>
-                    <p>Rs {item.price}</p>
-                  </div>
-                ))}
-              </TableCell>
-              {/* <TableCell>
+              <TableCell>PRODUCT</TableCell>
+              <TableCell>CATEGORY</TableCell>
+              <TableCell>PRICE</TableCell>
+              <TableCell>STOCK</TableCell>
+              {/* <TableCell>STATUS</TableCell> */}
+              <TableCell align="right">ACTIONS</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {products.map((row) => (
+              <TableRow
+                key={row._id}
+                hover
+                sx={{ "& td": { py: 2.5, borderBottom: "1px solid #F3F4F6" } }}
+              >
+                <TableCell>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                    {/* Display the actual product image */}
+                    <Avatar
+                      src={row.image?.url}
+                      variant="rounded"
+                      sx={{
+                        width: 48,
+                        height: 48,
+                        bgcolor: "#F9FAFB",
+                        border: "1px solid #E5E7EB",
+                      }}
+                    />
+                    <Typography
+                      variant="body2"
+                      sx={{ fontWeight: 600, color: "#111827" }}
+                    >
+                      {row.productName}
+                    </Typography>
+                  </Box>
+                </TableCell>
+                <TableCell sx={{ color: "#6B7280" }}>{row.category}</TableCell>
+                <TableCell sx={{ fontWeight: 700, color: "#111827" }}>
+                  ₹{row.basePrice?.toLocaleString()}
+                </TableCell>
+                <TableCell sx={{ color: "#6B7280", width: "250px" }}>
+                  {row.variants?.map((item) => (
+                    <div key={item.size} className="flex gap-2">
+                      <p>{item.size}</p>
+                      <p>{item.stock} nos</p>
+                      <p>Rs {item.price}</p>
+                    </div>
+                  ))}
+                </TableCell>
+                {/* <TableCell>
                 <Chip
                   label={
                     row.status || (row.stock > 0 ? "In Stock" : "Out of Stock")
@@ -145,34 +156,46 @@ export default function ProductTable({ onEdit }) {
                   }}
                 />
               </TableCell> */}
-              <TableCell align="right">
-                <Box
-                  sx={{ display: "flex", justifyContent: "flex-end", gap: 1.5 }}
-                >
-                  <IconButton
-                    onClick={() => onEdit(row)}
-                    sx={{ color: "#9CA3AF", "&:hover": { color: "#F59E0B" } }}
-                  >
-                    <FiEdit size={18} />
-                  </IconButton>
-
-                  <IconButton
-                    onClick={() => handleDelete(row._id, row.productName)}
-                    disabled={isDeleting}
+                <TableCell align="right">
+                  <Box
                     sx={{
-                      color: "#9CA3AF",
-                      "&:hover": { color: "#EF4444" },
-                      opacity: isDeleting ? 0.5 : 1,
+                      display: "flex",
+                      justifyContent: "flex-end",
+                      gap: 1.5,
                     }}
                   >
-                    <RiDeleteBinLine size={18} />
-                  </IconButton>
-                </Box>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+                    <IconButton
+                      onClick={() => onEdit(row)}
+                      sx={{ color: "#9CA3AF", "&:hover": { color: "#F59E0B" } }}
+                    >
+                      <FiEdit size={18} />
+                    </IconButton>
+
+                    <IconButton
+                      onClick={() => handleDelete(row._id, row.productName)}
+                      disabled={isDeleting}
+                      sx={{
+                        color: "#9CA3AF",
+                        "&:hover": { color: "#EF4444" },
+                        opacity: isDeleting ? 0.5 : 1,
+                      }}
+                    >
+                      <RiDeleteBinLine size={18} />
+                    </IconButton>
+                  </Box>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      {data.totalPages > 1 && (
+        <PaginationComponent
+          page={currentPage}
+          totalPage={data.totalPages}
+          pageChange={(e, v) => setCurrentPage(v)}
+        />
+      )}
+    </>
   );
 }

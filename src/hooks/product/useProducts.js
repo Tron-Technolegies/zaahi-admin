@@ -2,11 +2,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../services/api";
 import { toast } from "react-toastify";
 
-export const useGetProducts = () => {
+export const useGetProducts = ({ search, currentPage }) => {
   return useQuery({
-    queryKey: ["products"],
+    queryKey: ["products", search, currentPage],
     queryFn: async () => {
-      const { data } = await api.get(`/product`);
+      const { data } = await api.get(`/product`, {
+        params: { search, currentPage },
+      });
       return data; // returns { products, totalPages, totalProducts }
     },
   });

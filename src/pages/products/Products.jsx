@@ -21,12 +21,12 @@ export default function Products() {
   };
 
   return (
-    <div className="p-10 min-h-screen flex flex-col gap-8 bg-[#FAFAFA]">
-      <div className="flex items-center justify-between">
-        <button className="flex items-center gap-1 px-4 py-1.5 border border-gray-300 rounded-xl text-gray-600 font-semibold bg-white hover:bg-gray-50 transition-all shadow-sm text-lg">
+    <div className="md:p-10 p-3 min-h-screen flex flex-col gap-8 bg-[#FAFAFA]">
+      <div className="flex items-center justify-end">
+        {/* <button className="flex items-center gap-1 px-4 py-1.5 border border-gray-300 rounded-xl text-gray-600 font-semibold bg-white hover:bg-gray-50 transition-all shadow-sm text-lg">
           <FiFilter className="text-xl" />
           <span>Filter</span>
-        </button>
+        </button> */}
 
         {/* This component now contains its own "Add Product" button and Dialog */}
         <AddProductDialog />
@@ -35,7 +35,11 @@ export default function Products() {
       <ProductTable onEdit={handleEditOpen} />
 
       {/* Specifically for editing existing records */}
-      <EditProductDialog open={editOpen} onClose={handleEditClose} item={selectedProduct} />
+      <EditProductDialog
+        open={editOpen}
+        onClose={handleEditClose}
+        item={selectedProduct}
+      />
     </div>
   );
 }
