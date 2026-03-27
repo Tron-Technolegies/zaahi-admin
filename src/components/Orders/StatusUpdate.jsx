@@ -3,7 +3,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import { useState } from "react";
-import { useUpdateOrderStatus } from "../../hooks/Orders/useOrders";
+import { useUpdateOrderStatus } from "../../hooks/useOrders";
 
 const style = {
   position: "absolute",

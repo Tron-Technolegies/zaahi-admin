@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import OrderTable from "../../components/Orders/OrderTable";
-import { useGetOrder } from "../../hooks/Orders/useOrders";
+
 import PaginationComponent from "../../components/PaginationComponent";
+import { useGetOrder } from "../../hooks/useOrders";
 
 export default function Orders() {
   const [currentPage, setCurrentPage] = useState(1);
