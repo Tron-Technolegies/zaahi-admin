@@ -3,7 +3,7 @@ import { api } from "../services/api";
 
 export const userInfoLoader = async () => {
   try {
-    const response = await api.get(`/user/info`);
+    const response = await api.get(`/user/info`, { withCredentials: true });
     const data = response.data;
     const user = data;
 
@@ -15,7 +15,11 @@ export const userInfoLoader = async () => {
     }
     return user;
   } catch (error) {
-    console.error(error?.response?.data?.error || error?.response?.data?.message || error.message);
+    console.error(
+      error?.response?.data?.error ||
+        error?.response?.data?.message ||
+        error.message,
+    );
     return redirect("/login");
   }
 };

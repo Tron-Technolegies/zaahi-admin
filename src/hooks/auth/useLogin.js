@@ -7,7 +7,7 @@ export const useLogin = () => {
   const navigate = useNavigate();
   const { isPending, mutateAsync } = useMutation({
     mutationFn: async (data) => {
-      await api.post(`/auth/login`, data);
+      await api.post(`/auth/login`, data, { withCredentials: true });
     },
     onSuccess: () => {
       navigate("/dashboard");
