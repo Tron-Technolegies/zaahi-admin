@@ -1,37 +1,37 @@
-import * as React from 'react';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
-import { useAddBrands } from '../../hooks/brands/useBrands';
+import * as React from "react";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
+import { useAddBrands } from "../../hooks/brands/useBrands";
 
 export default function BrandDialog({ open, handleClose }) {
-  const [brandName, setBrandName] = React.useState('');
+  const [brandName, setBrandName] = React.useState("");
   const { isPending, mutateAsync } = useAddBrands();
 
   return (
     <Dialog
       open={open}
       onClose={handleClose}
-      aria-labelledby='add-brand-dialog'
+      aria-labelledby="add-brand-dialog"
       BackdropProps={{
-        sx: { backdropFilter: 'blur(2px)' },
+        sx: { backdropFilter: "blur(2px)" },
       }}
       PaperProps={{
         sx: {
-          background: '#EEEEEE',
+          background: "#EEEEEE",
           borderRadius: 3,
           width: 350,
-          boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+          boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
         },
       }}
     >
       <DialogTitle
-        id='add-brand-dialog'
+        id="add-brand-dialog"
         sx={{
-          textAlign: 'center',
+          textAlign: "center",
           fontWeight: 600,
           fontSize: 20,
           p: 3,
@@ -43,7 +43,7 @@ export default function BrandDialog({ open, handleClose }) {
       <IconButton
         onClick={handleClose}
         sx={{
-          position: 'absolute',
+          position: "absolute",
           right: 8,
           top: 8,
         }}
@@ -54,29 +54,30 @@ export default function BrandDialog({ open, handleClose }) {
       <DialogContent
         dividers
         sx={{
-          display: 'flex',
-          justifyContent: 'center',
+          display: "flex",
+          justifyContent: "center",
         }}
       >
         <input
-          className='p-2 bg-gray-100 rounded-md outline-none w-55 text-center font-medium'
-          placeholder='Enter brand name'
+          className="p-2 bg-gray-100 rounded-md outline-none w-55 text-center font-medium"
+          placeholder="Enter brand name"
           value={brandName}
           onChange={(e) => setBrandName(e.target.value)}
           required
         />
       </DialogContent>
 
-      <DialogActions sx={{ justifyContent: 'center', pb: 2 }}>
+      <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
         <button
           onClick={async () => {
             const data = { brandName };
             await mutateAsync(data);
+            setBrandName("");
             handleClose();
           }}
-          className='bg-black text-white px-4 py-1 rounded-md hover:bg-gray-800 transition'
+          className="bg-black text-white px-4 py-1 rounded-md hover:bg-gray-800 transition"
         >
-          {isPending ? 'saving...' : 'Save'}
+          {isPending ? "saving..." : "Save"}
         </button>
       </DialogActions>
     </Dialog>

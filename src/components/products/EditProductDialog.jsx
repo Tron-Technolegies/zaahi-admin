@@ -1,96 +1,117 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  IconButton,
-  Typography,
-  Box,
-  TextField,
-  Select,
-  MenuItem,
-  Button,
-} from "@mui/material";
+import { Dialog, DialogTitle, IconButton, Typography } from "@mui/material";
 import { FiX, FiUploadCloud } from "react-icons/fi";
-import { useEditProduct, useGetSingleProduct } from "../../hooks/product/useProducts";
+import {
+  useDeleteProductImage,
+  useEditProduct,
+  useGetSingleProduct,
+} from "../../hooks/product/useProducts";
 import { useGetCategories } from "../../hooks/categories/useCategory";
-import { toast } from "react-toastify";
+import { IoTrash } from "react-icons/io5";
+import { useGetBrands } from "../../hooks/brands/useBrands";
+import { BsUpload } from "react-icons/bs";
+import Loading from "../Loading";
 
 export default function EditProductDialog({ open, onClose, item }) {
   // Aliasing 'data' to 'productData' for the useEffect
-  const { data: productData } = useGetSingleProduct({ id: item?._id });
-  const { data: categoriesData, isLoading: catLoading } = useGetCategories();
-
-  // Normalizing the categories array
-  const categories = Array.isArray(categoriesData)
-    ? categoriesData
-    : categoriesData?.categories || categoriesData?.data || [];
-
-  const { isPending, mutateAsync } = useEditProduct();
-  const fileInputRef = useRef(null);
-  const [selectedFile, setSelectedFile] = useState(null);
-
-  const [formData, setFormData] = useState({
-    productName: "",
-    category: "",
-    price: "",
-    stock: "",
-    status: "In Stock",
+  const {
+    data: productData,
+    isLoading: productLoading,
+    isError,
+    error,
+  } = useGetSingleProduct({
+    id: item?._id,
   });
+  const { data: categoriesData, isLoading: catLoading } = useGetCategories();
+  const { data: allBrands, isLoading: brandLoading } = useGetBrands();
+  const { isPending, mutateAsync } = useEditProduct();
+  const { isPending: deletePending, mutateAsync: deleteImage } =
+    useDeleteProductImage();
+  const [image, setImage] = useState("");
+  const [extraImages, setExtraImages] = useState([]);
+  const [specs, setSpecs] = useState([]);
+  const [size, setSize] = useState([]);
+  const [isFeatured, setIsFeatured] = useState(false);
+  const [oldImage, setOldImage] = useState(null);
+  const [oldExtraImages, setOldExtraImages] = useState([]);
 
-  // Sync state when product data arrives
+  //for specs
+  function addSpecs() {
+    setSpecs([...specs, { spec: "", value: "" }]);
+  }
+  function updateSpecs(index, field, value) {
+    const updated = [...specs];
+    updated[index][field] = value;
+    setSpecs(updated);
+  }
+  function removeSpecs(index) {
+    setSpecs(specs.filter((_, i) => i !== index));
+  }
+
+  //for size
+  function addSize() {
+    setSize([...size, { size: "", price: "", stock: "" }]);
+  }
+
+  function updateSize(index, field, value) {
+    const updated = [...size];
+    updated[index][field] = value;
+    setSize(updated);
+  }
+
+  function removeSize(index) {
+    setSize(size.filter((_, i) => i !== index));
+  }
+
+  useEffect(() => {
+    return () => {
+      if (image) URL.revokeObjectURL(image);
+      extraImages.forEach((img) => URL.revokeObjectURL(img));
+    };
+  }, [image, extraImages]);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    const formdata = new FormData(e.target);
+    formdata.append("specs", JSON.stringify(specs));
+    formdata.append("size", JSON.stringify(size));
+    if (isFeatured) {
+      formdata.append("isFeatured", "true");
+    }
+    await mutateAsync({ id: productData._id, data: formdata });
+    e.target.reset();
+    setSpecs([]);
+    setSize([]);
+    setImage("");
+    setExtraImages([]);
+    setOldExtraImages([]);
+    setOldImage(null);
+    onClose();
+  }
+
   useEffect(() => {
     if (productData) {
-      setFormData({
-        productName: productData.productName || "",
-        category: productData.category || "",
-        price: productData.price || "",
-        stock: productData.stock || "",
-        status: productData.status || "In Stock",
-      });
+      setOldImage(productData.image);
+      setOldExtraImages(productData.extraImages);
+      setSize(productData.variants);
+      setSpecs(productData.specification);
+      setIsFeatured(productData.isFeatured);
     }
   }, [productData]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleFileChange = (e) => {
-    if (e.target.files?.[0]) {
-      setSelectedFile(e.target.files[0]);
-    }
-  };
-
-  const handleUpdate = async () => {
-    const data = new FormData();
-    data.append("productName", formData.productName);
-    data.append("price", formData.price);
-    data.append("category", formData.category);
-    data.append("stock", formData.stock);
-    data.append("status", formData.status);
-
-    if (selectedFile) {
-      data.append("image", selectedFile);
-    }
-
-    try {
-      await mutateAsync({ id: item._id, data });
-      setSelectedFile(null);
-      onClose();
-    } catch (error) {
-      console.error("Update failed", error);
-    }
-  };
-
   return (
     <Dialog
       open={open}
       onClose={onClose}
       fullWidth
       maxWidth="sm"
-      PaperProps={{ sx: { borderRadius: "20px" } }}
+      PaperProps={{
+        sx: {
+          boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.1)",
+          maxHeight: "95vh",
+          padding: "10px",
+          overflowY: "scroll",
+        },
+      }}
     >
       <DialogTitle
         sx={{
@@ -108,135 +129,311 @@ export default function EditProductDialog({ open, onClose, item }) {
           <FiX size={22} />
         </IconButton>
       </DialogTitle>
-
-      <DialogContent sx={{ px: 3, py: 0, overflowY: "auto" }}>
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5, mt: 0.5 }}>
-          <Box sx={{ width: "100%" }}>
-            <Typography variant="caption" sx={{ fontWeight: 700, mb: 0.5, display: "block" }}>
-              Product Name
-            </Typography>
-            <TextField
-              fullWidth
-              name="productName"
-              value={formData.productName}
-              onChange={handleChange}
+      {productLoading ? (
+        <Loading />
+      ) : isError ? (
+        <p>{error.message}</p>
+      ) : (
+        productData && (
+          <form className="flex flex-col gap-2 p-3" onSubmit={handleSubmit}>
+            <label className="text-xs font-medium">Product Name</label>
+            <input
+              type="text"
+              name="name"
+              defaultValue={productData.productName}
+              placeholder="Product Name"
+              className="p-2 outline-none border rounded-sm border-[#E8E8E8]"
             />
-          </Box>
-
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-            <Box sx={{ flex: "1 1 calc(50% - 8px)" }}>
-              <Typography variant="caption" sx={{ fontWeight: 700, mb: 0.5, display: "block" }}>
-                Category
-              </Typography>
-              <Select
-                fullWidth
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                disabled={catLoading}
-                displayEmpty
-                sx={{ borderRadius: "10px", height: "48px" }}
-              >
-                <MenuItem value="" disabled>
-                  Select Category
-                </MenuItem>
-                {categories.map((cat) => (
-                  // Using fallbacks in case the property isn't exactly 'name'
-                  <MenuItem
-                    key={cat._id}
-                    value={cat.name || cat.categoryName || cat.title || cat._id}
+            <label className="text-xs font-medium">Category</label>
+            <select
+              name="category"
+              defaultValue={productData.category}
+              placeholder="Product Name"
+              className="p-2 outline-none border rounded-sm border-[#E8E8E8]"
+            >
+              {catLoading ? (
+                <p>....</p>
+              ) : (
+                categoriesData.map((item) => (
+                  <option key={item._id} value={item.categoryName}>
+                    {item.categoryName}
+                  </option>
+                ))
+              )}
+            </select>
+            <label className="text-xs font-medium">Brand</label>
+            <select
+              name="brand"
+              defaultValue={productData.brand}
+              placeholder="Product Name"
+              className="p-2 outline-none border rounded-sm border-[#E8E8E8]"
+            >
+              {brandLoading ? (
+                <p>....</p>
+              ) : (
+                allBrands.map((item) => (
+                  <option key={item._id} value={item.brandName}>
+                    {item.brandName}
+                  </option>
+                ))
+              )}
+            </select>
+            <label className="text-xs font-medium">Base Price</label>
+            <input
+              type="number"
+              name="price"
+              defaultValue={productData.basePrice}
+              placeholder="Base Price"
+              className="p-2 outline-none border rounded-sm border-[#E8E8E8]"
+            />
+            <label className="text-xs font-medium">Description</label>
+            <textarea
+              name="description"
+              defaultValue={productData.description}
+              placeholder="Product Description"
+              className="p-2 outline-none border rounded-sm border-[#E8E8E8]"
+              rows={5}
+            />
+            {oldImage && (
+              <div>
+                <label className="text-xs font-medium mb-2">
+                  Current Product Image
+                </label>
+                <div className="flex flex-col items-center w-fit">
+                  <img
+                    src={oldImage.url}
+                    alt="preview"
+                    className="w-24 h-24 my-3 object-cover rounded-md"
+                  />
+                  <button
+                    type="button"
+                    disabled={deletePending}
+                    onClick={() =>
+                      deleteImage({
+                        productId: productData._id,
+                        imageType: "image",
+                        publicId: oldImage.publicId,
+                      })
+                    }
                   >
-                    {cat.name || cat.categoryName || cat.title || "Unnamed Category"}
-                  </MenuItem>
-                ))}
-              </Select>
-            </Box>
+                    {deletePending ? (
+                      "..."
+                    ) : (
+                      <IoTrash className="text-red-500 cursor-pointer" />
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
+            <div className="">
+              <h4 className="text-xs font-medium mb-2">Main Product Image</h4>
+              <label
+                className={`flex flex-col gap-2 justify-center border w-fit items-center p-3 rounded-lg border-blue-500 cursor-pointer hover:bg-blue-700 nav-link hover:text-white `}
+              >
+                <input
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  name="image"
+                  onChange={(e) => setImage(e.target.files[0])}
+                  multiple={false}
+                />
+                <div className="text-xl">
+                  <BsUpload />
+                </div>
+                <p>Upload</p>
+              </label>
+              {image && (
+                <img
+                  src={URL.createObjectURL(image)}
+                  alt="preview"
+                  className="w-24 h-24 my-3 object-cover rounded-md"
+                />
+              )}
+            </div>
+            <div className="mb-2 flex flex-col gap-2">
+              <label className="text-xs font-medium mb-2">Specifications</label>
+              {specs?.map((item, index) => (
+                <div
+                  key={index}
+                  className="flex lg:flex-row flex-col gap-2 my-1"
+                >
+                  <input
+                    type="text"
+                    value={item.spec}
+                    onChange={(e) => updateSpecs(index, "spec", e.target.value)}
+                    placeholder="Enter the specification"
+                    className="w-full py-1 px-3 rounded-lg bg-white border  outline-none text-gray-900 h-11"
+                  />
+                  <input
+                    type="text"
+                    value={item.value}
+                    onChange={(e) =>
+                      updateSpecs(index, "value", e.target.value)
+                    }
+                    placeholder="Enter value for specification"
+                    className="w-full py-1 px-3 rounded-lg bg-white border  outline-none text-gray-900 h-11"
+                  />
+                  <button
+                    type="button"
+                    className="px-2 py-2 rounded-md bg-red-700 text-white"
+                    onClick={() => removeSpecs(index)}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                className="px-2 mt-3 py-2 rounded-md bg-black text-white"
+                onClick={() => addSpecs()}
+              >
+                Add New Spec
+              </button>
+            </div>
+            <div className="mb-2 flex flex-col gap-2">
+              <label className="text-xs font-medium mb-2">
+                Sizes & Variants
+              </label>
 
-            <Box sx={{ flex: "1 1 calc(50% - 8px)" }}>
-              <Typography variant="caption" sx={{ fontWeight: 700, mb: 0.5, display: "block" }}>
-                Price
-              </Typography>
-              <TextField
-                fullWidth
-                name="price"
-                type="number"
-                value={formData.price}
-                onChange={handleChange}
-              />
-            </Box>
+              {size?.map((item, index) => (
+                <div
+                  key={index}
+                  className="flex lg:flex-row flex-col gap-2 my-1"
+                >
+                  {/* Size */}
+                  <input
+                    type="text"
+                    value={item.size}
+                    onChange={(e) => updateSize(index, "size", e.target.value)}
+                    placeholder="Size (S, M, L)"
+                    className="w-full py-1 px-3 rounded-lg bg-white border outline-none text-gray-900 h-11"
+                  />
 
-            <Box sx={{ flex: "1 1 calc(50% - 8px)" }}>
-              <Typography variant="caption" sx={{ fontWeight: 700, mb: 0.5, display: "block" }}>
-                Stock
-              </Typography>
-              <TextField
-                fullWidth
-                name="stock"
-                type="number"
-                value={formData.stock}
-                onChange={handleChange}
-              />
-            </Box>
+                  {/* Price */}
+                  <input
+                    type="number"
+                    value={item.price}
+                    onChange={(e) => updateSize(index, "price", e.target.value)}
+                    placeholder="Price"
+                    className="w-full py-1 px-3 rounded-lg bg-white border outline-none text-gray-900 h-11"
+                  />
 
-            <Box sx={{ flex: "1 1 calc(50% - 8px)" }}>
-              <Typography variant="caption" sx={{ fontWeight: 700, mb: 0.5, display: "block" }}>
-                Status
-              </Typography>
-              <Select fullWidth name="status" value={formData.status} onChange={handleChange}>
-                <MenuItem value="In Stock">In Stock</MenuItem>
-                <MenuItem value="Low Stock">Low Stock</MenuItem>
-                <MenuItem value="Out of Stock">Out of Stock</MenuItem>
-              </Select>
-            </Box>
-          </Box>
+                  {/* Stock */}
+                  <input
+                    type="number"
+                    value={item.stock}
+                    onChange={(e) => updateSize(index, "stock", e.target.value)}
+                    placeholder="Stock"
+                    className="w-full py-1 px-3 rounded-lg bg-white border outline-none text-gray-900 h-11"
+                  />
 
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            style={{ display: "none" }}
-            accept="image/*"
-          />
-          <Box
-            onClick={() => fileInputRef.current.click()}
-            sx={{
-              border: selectedFile ? "1.5px solid #FACC15" : "1.5px dashed #9CA3AF",
-              borderRadius: "12px",
-              py: 3,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              cursor: "pointer",
-              bgcolor: selectedFile ? "#FFFBEB" : "transparent",
-            }}
-          >
-            <FiUploadCloud size={30} color={selectedFile ? "#FACC15" : "#6B7280"} />
-            <Typography variant="caption" sx={{ color: "#6B7280", fontWeight: 600 }}>
-              {selectedFile ? selectedFile.name : "Update image (Optional)"}
-            </Typography>
-          </Box>
-        </Box>
-      </DialogContent>
+                  {/* Remove */}
+                  <button
+                    type="button"
+                    className="px-2 py-2 rounded-md bg-red-700 text-white"
+                    onClick={() => removeSize(index)}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
 
-      <DialogActions sx={{ p: 2, pr: 3, pb: 3, gap: 2 }}>
-        <Button onClick={onClose} sx={{ color: "#4B5563", fontWeight: "bold" }}>
-          Cancel
-        </Button>
-        <Button
-          variant="contained"
-          disabled={isPending}
-          onClick={handleUpdate}
-          sx={{
-            bgcolor: "#1C1C1C",
-            color: "#FACC15",
-            px: 4,
-            borderRadius: "10px",
-            fontWeight: "bold",
-          }}
-        >
-          {isPending ? "Updating..." : "Save Changes"}
-        </Button>
-      </DialogActions>
+              <button
+                type="button"
+                className="px-2 mt-3 py-2 rounded-md bg-black text-white"
+                onClick={addSize}
+              >
+                Add Size
+              </button>
+            </div>
+            {oldExtraImages.length > 0 && (
+              <div>
+                <label className="form-label">Current Extra Images</label>
+                <div className="flex gap-2 items-center">
+                  {oldExtraImages.map((x) => (
+                    <div
+                      className="flex flex-col items-center w-fit"
+                      key={x.publicId}
+                    >
+                      <img
+                        src={x.url}
+                        alt="preview"
+                        className="w-24 h-24 my-3 object-cover rounded-md"
+                      />
+                      <button
+                        type="button"
+                        disabled={deletePending}
+                        onClick={() =>
+                          deleteImage({
+                            productId: productData._id,
+                            publicId: x.publicId,
+                            imageType: "extraImages",
+                          })
+                        }
+                      >
+                        {deletePending ? (
+                          "..."
+                        ) : (
+                          <IoTrash className="text-red-500 cursor-pointer" />
+                        )}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            <div className="">
+              <h4 className="text-xs font-medium mb-2">Extra Product Images</h4>
+              <label
+                className={`flex flex-col gap-2 justify-center border w-fit items-center p-3 rounded-lg border-blue-500 cursor-pointer hover:bg-blue-700 nav-link hover:text-white `}
+              >
+                <input
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  name="extraImages"
+                  onChange={(e) => {
+                    const files = Array.from(e.target.files);
+                    if (!files.length) return;
+                    setExtraImages(files);
+                  }}
+                  multiple
+                />
+                <div className="text-xl">
+                  <BsUpload />
+                </div>
+                <p>Upload</p>
+              </label>
+              <div className="flex gap-2 items-center">
+                {extraImages.length > 0 &&
+                  extraImages.map((item, i) => {
+                    return (
+                      <div className="flex gap-2 items-center" key={i}>
+                        <img
+                          src={URL.createObjectURL(item)}
+                          alt="preview"
+                          className="w-24 h-24 my-3 object-cover rounded-md"
+                        />
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+            <label className="font-medium text-xs">Is isFeatured</label>
+            <input
+              type="checkbox"
+              className="w-fit p-2"
+              placeholder="Featured"
+              checked={isFeatured}
+              onChange={(e) => setIsFeatured(e.target.checked)}
+            />
+            <button className="p-2 bg-black text-white" disabled={isPending}>
+              {isPending ? "Updating..." : "Update Product"}
+            </button>
+          </form>
+        )
+      )}
     </Dialog>
   );
 }

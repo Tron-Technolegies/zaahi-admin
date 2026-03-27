@@ -1,9 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { api } from '../../services/api';
-import { toast } from 'react-toastify';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { api } from "../../services/api";
+import { toast } from "react-toastify";
 export const useGetBrands = () => {
   const { isLoading, isError, error, data } = useQuery({
-    queryKey: ['brands'],
+    queryKey: ["brands"],
     queryFn: async () => {
       const { data } = await api.get(`/brand`);
       return data;
@@ -20,9 +20,9 @@ export const useAddBrands = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['brands'],
+        queryKey: ["brands"],
       });
-      toast.success('Added');
+      toast.success("Added");
     },
     onError: (error) => {
       toast.error(
@@ -37,7 +37,7 @@ export const useAddBrands = () => {
 
 export const useGetSingleBrand = ({ id }) => {
   const { isLoading, isError, error, data } = useQuery({
-    queryKey: ['brand', id],
+    queryKey: ["brand", id],
     queryFn: async () => {
       const { data } = await api.get(`/brand/${id}`);
       return data;
@@ -53,10 +53,10 @@ export const useEditBrand = () => {
       await api.patch(`/brand/edit/${data.id}`, data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['brands'] });
-      queryClient.invalidateQueries({ queryKey: ['brand'] });
+      queryClient.invalidateQueries({ queryKey: ["brands"] });
+      queryClient.invalidateQueries({ queryKey: ["brand"] });
 
-      toast.success('Updated');
+      toast.success("Updated");
     },
     onError: (error) => {
       toast.error(
@@ -76,9 +76,9 @@ export const useDeleteBrand = () => {
       await api.delete(`/brand/delete/${data.id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['brands'] });
+      queryClient.invalidateQueries({ queryKey: ["brands"] });
 
-      toast.success('Deleted');
+      toast.success("Deleted");
     },
     onError: (error) => {
       toast.error(
