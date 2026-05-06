@@ -7,3 +7,4 @@ export const api = axios.create({
 
 //https://zaahi-backend.onrender.com
 //http://localhost:3000
+//https://api.zaahidesigns.com

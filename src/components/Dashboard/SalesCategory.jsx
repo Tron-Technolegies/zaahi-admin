@@ -1,23 +1,25 @@
-import * as React from 'react';
-import { Card, CardContent, Typography, Box, Stack } from '@mui/material';
-import { PieChart } from '@mui/x-charts/PieChart';
+import * as React from "react";
+import { Card, CardContent, Typography, Box, Stack } from "@mui/material";
+import { PieChart } from "@mui/x-charts/PieChart";
+import { useGetDashboardOverview } from "../../hooks/stats/useStats";
 
 const COLORS = {
-  gold: '#C9A227',
-  black: '#1C1917',
-  gray: '#A8A29E',
-  darkGray: '#44403C',
-  lightBg: '#F5F5F4',
+  gold: "#C9A227",
+  black: "#1C1917",
+  gray: "#A8A29E",
+  darkGray: "#44403C",
+  lightBg: "#F5F5F4",
 };
 
 const salesData = [
-  { id: 0, value: 400, label: 'Watches', color: COLORS.black },
-  { id: 1, value: 300, label: 'Accessories', color: COLORS.gold },
-  { id: 2, value: 300, label: 'Fine Art', color: COLORS.gray },
-  { id: 3, value: 200, label: 'Jewelry', color: COLORS.darkGray },
+  { id: 0, value: 400, label: "Watches", color: COLORS.black },
+  { id: 1, value: 300, label: "Accessories", color: COLORS.gold },
+  { id: 2, value: 300, label: "Fine Art", color: COLORS.gray },
+  { id: 3, value: 200, label: "Jewelry", color: COLORS.darkGray },
 ];
 
 const SalesCategory = () => {
+  const { isLoading, data } = useGetDashboardOverview();
   return (
     <Card
       sx={{
@@ -28,11 +30,11 @@ const SalesCategory = () => {
       }}
     >
       <CardContent>
-        <Typography variant='h6' fontWeight={600} mb={2}>
+        <Typography variant="h6" fontWeight={600} mb={2}>
           Sales by Category
         </Typography>
 
-        <Box display='flex' justifyContent='center'>
+        {/* <Box display="flex" justifyContent="center">
           <PieChart
             series={[
               {
@@ -49,30 +51,30 @@ const SalesCategory = () => {
               legend: { hidden: true },
             }}
           />
-        </Box>
+        </Box> */}
 
         <Stack spacing={1} mt={2}>
-          {salesData.map((item) => (
+          {data?.dashboard?.salesByCategory?.map((item) => (
             <Box
-              key={item.id}
-              display='flex'
-              justifyContent='space-between'
-              alignItems='center'
+              key={item._id}
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
             >
-              <Box display='flex' alignItems='center' gap={1}>
+              <Box display="flex" alignItems="center" gap={1}>
                 <Box
                   sx={{
                     width: 10,
                     height: 10,
-                    borderRadius: '50%',
-                    backgroundColor: item.color,
+                    borderRadius: "50%",
+                    backgroundColor: item.color || "black",
                   }}
                 />
-                <Typography variant='body2'>{item.label}</Typography>
+                <Typography variant="body2">{item._id}</Typography>
               </Box>
 
-              <Typography variant='body2' fontWeight={500}>
-                {item.value} sales
+              <Typography variant="body2" fontWeight={500}>
+                {item.totalSales} sales
               </Typography>
             </Box>
           ))}
