@@ -90,7 +90,7 @@ export default function OrderTable({ data }) {
                     {row.user?.username}
                   </StyledTableCell>
                   <StyledTableCell align="left">
-                    {row.totalPrice}
+                    {row.currency} {row.totalPrice}
                   </StyledTableCell>
 
                   <StyledTableCell
