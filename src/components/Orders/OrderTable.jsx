@@ -87,7 +87,7 @@ export default function OrderTable({ data }) {
                     </div>
                   </StyledTableCell>
                   <StyledTableCell align="left">
-                    {row.user?.username}
+                    {row.user?.username || row.username}
                   </StyledTableCell>
                   <StyledTableCell align="left">
                     {row.currency} {row.totalPrice}

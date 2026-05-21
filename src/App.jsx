@@ -10,6 +10,7 @@ import {
   Error,
   Orders,
   Products,
+  VAT,
 } from "./pages";
 import { userInfoLoader } from "./loader/UserLoader";
 import Login from "./pages/Login";
@@ -36,6 +37,7 @@ export const router = createBrowserRouter([
       { path: "orders", element: <Orders /> },
       // { path: "coupons", element: <Coupons /> },
       { path: "customers", element: <Customers /> },
+      { path: "shipping", element: <VAT /> },
     ],
   },
   { path: "/login", element: <Login /> },
