@@ -36,7 +36,8 @@ const DashboardStats = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <DashboardCard
           title="Total Revenue"
-          value={`Rs ${data?.dashboard?.totalRevenue || 0}`}
+          value={`Rs ${data?.dashboard?.totalRevenue?.INR?.toFixed(2) || 0} `}
+          value2={`AED ${data?.dashboard?.totalRevenue?.AED?.toFixed(2) || 0} `}
           percentage="12%"
           isPositive={true}
           icon={<FaDollarSign />}

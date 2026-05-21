@@ -1,5 +1,9 @@
 import { IoMail, IoPeopleOutline, IoNotifications } from "react-icons/io5";
-import { MdOutlineDashboard, MdOutlineInventory } from "react-icons/md";
+import {
+  MdOutlineDashboard,
+  MdOutlineInventory,
+  MdOutlineLocalShipping,
+} from "react-icons/md";
 import { RiToolsFill, RiCoupon3Line } from "react-icons/ri";
 import { FiShoppingCart } from "react-icons/fi";
 import { LuBox, LuBoxes } from "react-icons/lu";
@@ -47,6 +51,13 @@ export const adminNavLinks = [
     path: "/customers",
     urlword: "customers",
     icon: <IoPeopleOutline />,
+  },
+  {
+    id: 6,
+    name: "Shipping & VAT",
+    path: "/shipping",
+    urlword: "shipping",
+    icon: <MdOutlineLocalShipping />,
   },
   // {
   //   id: 6,

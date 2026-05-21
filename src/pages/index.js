@@ -6,3 +6,4 @@ export { default as Dashboard } from "./dashboard/Dashboard";
 export { default as Error } from "./error/Error";
 export { default as Orders } from "./orders/Orders";
 export { default as Products } from "./products/Products";
+export { default as VAT } from "./vat/VAT";
